@@ -1,6 +1,7 @@
 # Back-Propagation Neural Networks
 #
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 # our sigmoid function, tanh is a little nicer than the standard 1/(1+e^-x)
@@ -193,6 +194,35 @@ def demo():
     n.train(pat)
     # test it
     n.test(pat)
+
+
+def plotting(min=0, max=1, l=500, iter=100):
+    X = np.concatenate((np.random.uniform(min, max, size=(l, 2)), np.ones((l, 1))), axis = 1)
+    wc = np.array([0.5, 1, -1])
+    y = (np.dot(X, wc) > 0) * 2 - 1
+    alpha = alpha0 = 0.05
+    w = np.random.randn(3)
+
+    for i in range(iter):
+        c = (np.dot(X, w) > 0) != (y > 0)
+        if sum(c) == 0:
+            break
+        w += alpha * np.dot(y[c] - 0, X[c])
+        #w /= w[1]
+        if i > 50:
+            alpha = alpha0/(i-50)
+        plt.clf()
+
+        plt.plot(X[:, 0][y == 1], X[:, 1][y == 1], 'b.',
+                 X[:, 0][y == -1], X[:, 1][y == -1], 'r.',
+                 X[:, 0], -w[2]/w[1]-w[0]/w[1]*X[:, 0],
+                 X[:, 0], -wc[2]/wc[1]-wc[0]/wc[1]*X[:, 0])
+        plt.xlim((min, max))
+        plt.ylim((min, max))
+        plt.draw()
+        plt.pause(.1)
+    
+    print(i, sum(c))
 
 
 if __name__ == '__main__':
